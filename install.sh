@@ -38,7 +38,7 @@ fi
 
 # Cd into the aflat directory
 mkdir ~/.aflat
-(cd ~/.aflat && git clone https://github.com/DeForestt/aflat.git)
+(cd ~/.aflat && git clone https://github.com/DeForestt/aflat-mac.git aflat)
 
 # Build aflat
 (cd ~/.aflat/aflat && mkdir bin && make ../. && cd .. && cmake --build build > buildLog.log)
