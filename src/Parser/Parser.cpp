@@ -361,7 +361,7 @@ ast::Statment *parse::Parser::parseStmt(links::LinkedList<lex::Token *> &tokens,
                       dynamic_cast<lex::OpSym *>(tokens.peek())->Sym == ')') {
                       auto symp = dynamic_cast<lex::OpSym *>(tokens.pop());
                       if (symp->Sym != ')')
-                        throw err::Exception("Expected closed perenth got " + symp->Sym);
+                        throw err::Exception("Expected closed perenth got " + std::string(1, symp->Sym));
                     } else {
                       do {
                         if (pop)
@@ -374,7 +374,7 @@ ast::Statment *parse::Parser::parseStmt(links::LinkedList<lex::Token *> &tokens,
                         auto symp = dynamic_cast<lex::OpSym *>(tokens.pop());
                         if (symp->Sym != ')')
                           throw err::Exception("Expected closed perenth got " +
-                                              symp->Sym);
+                                             std::string(1, symp->Sym));
                       }
                     }
                 };
@@ -956,7 +956,7 @@ ast::Statment *parse::Parser::parseStmt(links::LinkedList<lex::Token *> &tokens,
               dynamic_cast<lex::OpSym *>(tokens.peek())->Sym == ')') {
             auto symp = dynamic_cast<lex::OpSym *>(tokens.pop());
             if (symp->Sym != ')')
-              throw err::Exception("Expected closed perenth got " + symp->Sym);
+              throw err::Exception("Expected closed perenth got " + std::string(1, symp->Sym));
           } else {
             do {
               if (pop)
@@ -969,7 +969,7 @@ ast::Statment *parse::Parser::parseStmt(links::LinkedList<lex::Token *> &tokens,
               auto symp = dynamic_cast<lex::OpSym *>(tokens.pop());
               if (symp->Sym != ')')
                 throw err::Exception("Expected closed perenth got " +
-                                     symp->Sym);
+                                     std::string(1, symp->Sym));
             }
           }
           output = call;
@@ -1131,11 +1131,11 @@ parse::Parser::parseCondition(links::LinkedList<lex::Token *> &tokens) {
     auto sym = *dynamic_cast<lex::OpSym *>(tokens.pop());
     if (sym.Sym != '(')
       throw err::Exception("Line: " + std::to_string(tokens.peek()->lineCount) +
-                           "\'" + sym.Sym + "\"" +
+                           "'" + std::string(1, sym.Sym) + "'" +
                            "unOpened Condition.  Please open with: (");
   } else
-    throw err::Exception("Line: " + '\'' +
-                         dynamic_cast<lex::LObj *>(tokens.peek())->meta + '\'' +
+    throw err::Exception("Line: '" +
+                         dynamic_cast<lex::LObj *>(tokens.peek())->meta + "'" +
                          " unOpened Condition.  Please open with: (");
 
   output->expr1 = this->parseExpr(tokens);
@@ -1315,7 +1315,7 @@ ast::Expr *parse::Parser::parseExpr(links::LinkedList<lex::Token *> &tokens) {
         if (testSym != nullptr && testSym->Sym != '[') {
           auto symp = dynamic_cast<lex::OpSym *>(tokens.pop());
           if (symp->Sym != ')')
-            throw err::Exception("Expected closed perenth got " + symp->Sym);
+            throw err::Exception("Expected closed perenth got " + std::string(1, symp->Sym));
         } else {
           do {
             if (pop)
@@ -1328,7 +1328,7 @@ ast::Expr *parse::Parser::parseExpr(links::LinkedList<lex::Token *> &tokens) {
           if (dynamic_cast<lex::OpSym *>(tokens.peek()) != nullptr) {
             auto symp = dynamic_cast<lex::OpSym *>(tokens.pop());
             if (symp->Sym != ')')
-              throw err::Exception("Expected closed perenth got " + symp->Sym);
+              throw err::Exception("Expected closed perenth got " + std::string(1, symp->Sym));
           }
           output = newExpr;
         }
@@ -1382,7 +1382,7 @@ ast::Expr *parse::Parser::parseExpr(links::LinkedList<lex::Token *> &tokens) {
         if (testSym != nullptr && testSym->Sym != '[') {
           auto symp = dynamic_cast<lex::OpSym *>(tokens.pop());
           if (symp->Sym != ')')
-            throw err::Exception("Expected closed perenth got " + symp->Sym);
+            throw err::Exception("Expected closed perenth got " + std::string(1, symp->Sym));
         } else {
           do {
             if (pop)
@@ -1395,7 +1395,7 @@ ast::Expr *parse::Parser::parseExpr(links::LinkedList<lex::Token *> &tokens) {
           if (dynamic_cast<lex::OpSym *>(tokens.peek()) != nullptr) {
             auto symp = dynamic_cast<lex::OpSym *>(tokens.pop());
             if (symp->Sym != ')')
-              throw err::Exception("Expected closed perenth got " + symp->Sym);
+              throw err::Exception("Expected closed perenth got " + std::string(1, symp->Sym));
           }
         }
 
@@ -1545,112 +1545,114 @@ ast::Expr *parse::Parser::parseExpr(links::LinkedList<lex::Token *> &tokens) {
                          " Unknown Expr");
 
   ast::Compound *compound;
-  if (tokens.count > 0) if (dynamic_cast<lex::OpSym *>(tokens.peek()) != nullptr) {
-    auto sym = *dynamic_cast<lex::OpSym *>(tokens.peek());
+  if (tokens.count > 0) {
+    if (dynamic_cast<lex::OpSym *>(tokens.peek()) != nullptr) {
+      auto sym = *dynamic_cast<lex::OpSym *>(tokens.peek());
 
-    compound = new ast::Compound();
-    compound->logicalLine = sym.lineCount;
-    if (sym.Sym == '+') {
-      tokens.pop();
-      compound->op = ast::Plus;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.Sym == '-') {
-      tokens.pop();
-      compound->op = ast::Minus;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.Sym == '*') {
-      tokens.pop();
-      compound->op = ast::Mul;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if(sym.Sym == '^') {
-      tokens.pop();
-      compound->op = ast::Carrot;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.Sym == '/') {
-      tokens.pop();
-      compound->op = ast::Div;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.Sym == '%') {
-      tokens.pop();
-      compound->op = ast::Mod;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.Sym == '&') {
-      tokens.pop();
-      compound->op = ast::AndBit;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.Sym == '>') {
-      tokens.pop();
-      compound->op = ast::Great;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.Sym == '<') {
-      tokens.pop();
-      compound->op = ast::Less;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.Sym == '|') {
-      tokens.pop();
-      compound->op = ast::OrBit;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    }
-  } else if (dynamic_cast<lex::Symbol *>(tokens.peek()) != nullptr) {
-    compound = new ast::Compound();
-    auto sym = *dynamic_cast<lex::Symbol *>(tokens.peek());
-    compound->logicalLine = sym.lineCount;
-    if (sym.meta == "==") {
-      tokens.pop();
-      compound->op = ast::CompEqu;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.meta == "!=") {
-      tokens.pop();
-      compound->op = ast::NotEqu;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.meta == ">") {
-      tokens.pop();
-      compound->op = ast::GreatCmp;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.meta == "<") {
-      tokens.pop();
-      compound->op = ast::LessCmp;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.meta == ">=") {
-      tokens.pop();
-      compound->op = ast::Geq;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
-    } else if (sym.meta == "<=") {
-      tokens.pop();
-      compound->op = ast::Leq;
-      compound->expr1 = output;
-      compound->expr2 = this->parseExpr(tokens);
-      return prioritizeExpr(compound);
+      compound = new ast::Compound();
+      compound->logicalLine = sym.lineCount;
+      if (sym.Sym == '+') {
+        tokens.pop();
+        compound->op = ast::Plus;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.Sym == '-') {
+        tokens.pop();
+        compound->op = ast::Minus;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.Sym == '*') {
+        tokens.pop();
+        compound->op = ast::Mul;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if(sym.Sym == '^') {
+        tokens.pop();
+        compound->op = ast::Carrot;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.Sym == '/') {
+        tokens.pop();
+        compound->op = ast::Div;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.Sym == '%') {
+        tokens.pop();
+        compound->op = ast::Mod;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.Sym == '&') {
+        tokens.pop();
+        compound->op = ast::AndBit;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.Sym == '>') {
+        tokens.pop();
+        compound->op = ast::Great;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.Sym == '<') {
+        tokens.pop();
+        compound->op = ast::Less;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.Sym == '|') {
+        tokens.pop();
+        compound->op = ast::OrBit;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      }
+    } else if (dynamic_cast<lex::Symbol *>(tokens.peek()) != nullptr) {
+      compound = new ast::Compound();
+      auto sym = *dynamic_cast<lex::Symbol *>(tokens.peek());
+      compound->logicalLine = sym.lineCount;
+      if (sym.meta == "==") {
+        tokens.pop();
+        compound->op = ast::CompEqu;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.meta == "!=") {
+        tokens.pop();
+        compound->op = ast::NotEqu;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.meta == ">") {
+        tokens.pop();
+        compound->op = ast::GreatCmp;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.meta == "<") {
+        tokens.pop();
+        compound->op = ast::LessCmp;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.meta == ">=") {
+        tokens.pop();
+        compound->op = ast::Geq;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      } else if (sym.meta == "<=") {
+        tokens.pop();
+        compound->op = ast::Leq;
+        compound->expr1 = output;
+        compound->expr2 = this->parseExpr(tokens);
+        return prioritizeExpr(compound);
+      }
     }
   }
   return output;

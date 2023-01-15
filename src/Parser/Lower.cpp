@@ -139,26 +139,28 @@ ast::Statment *Lower::lowerFunction(ast::Function *func) {
 ast::Function *Lower::findFunction(ast::Statment *stmt, std::string ident,
                                    bool &fromClass) {
   
-  if (stmt) if (dynamic_cast<ast::Sequence *>(stmt) != nullptr) {
-   auto seq = dynamic_cast<ast::Sequence *>(stmt);
-    this->curr = seq;
-    if (this->findFunction(seq->Statment1, ident, fromClass) != nullptr)
-      return this->findFunction(seq->Statment1, ident, fromClass);
-    if (this->findFunction(seq->Statment2, ident, fromClass) != nullptr)
-      return this->findFunction(seq->Statment2, ident, fromClass);
-    // seq->Statment2 = this->lower(seq->Statment2);
-  } else if (dynamic_cast<ast::Function *>(stmt) != nullptr) {
-    auto func = dynamic_cast<ast::Function *>(stmt);
-    if (func->ident.ident == ident)
-      return func;
-  } else if (dynamic_cast<ast::Class *>(stmt) != nullptr) {
-    auto cl = dynamic_cast<ast::Class *>(stmt);
-    if (this->findFunction(cl->statment, ident, fromClass) != nullptr) {
-      fromClass = true;
-      bool trash;
-      return this->findFunction(cl->statment, ident, trash);
+  if (stmt) {
+    if (dynamic_cast<ast::Sequence *>(stmt) != nullptr) {
+      auto seq = dynamic_cast<ast::Sequence *>(stmt);
+      this->curr = seq;
+      if (this->findFunction(seq->Statment1, ident, fromClass) != nullptr)
+        return this->findFunction(seq->Statment1, ident, fromClass);
+      if (this->findFunction(seq->Statment2, ident, fromClass) != nullptr)
+        return this->findFunction(seq->Statment2, ident, fromClass);
+      // seq->Statment2 = this->lower(seq->Statment2);
+    } else if (dynamic_cast<ast::Function *>(stmt) != nullptr) {
+      auto func = dynamic_cast<ast::Function *>(stmt);
+      if (func->ident.ident == ident)
+        return func;
+    } else if (dynamic_cast<ast::Class *>(stmt) != nullptr) {
+      auto cl = dynamic_cast<ast::Class *>(stmt);
+      if (this->findFunction(cl->statment, ident, fromClass) != nullptr) {
+        fromClass = true;
+        bool trash;
+        return this->findFunction(cl->statment, ident, trash);
+      }
+      // cl->statment = this->lower(cl->statment);
     }
-    // cl->statment = this->lower(cl->statment);
   };
   return nullptr;
 }

@@ -1635,6 +1635,7 @@ ast::Expr * gen::CodeGenerator::imply(ast::Expr * expr, std::string typeName) {
     }
   }
   this->alert("Cannot imply type");
+  return nullptr;
 }
 
 links::LinkedList<gen::Symbol> gen::CodeGenerator::GenTable(

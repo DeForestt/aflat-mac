@@ -158,12 +158,10 @@ void build(std::string path, std::string output, cfg::Mutibility mutability, boo
   links::LinkedList<lex::Token *> tokens;
 
   auto filename = getExePath();
-  std::cout << filename << std::endl;
   auto wd = std::filesystem::current_path();
   auto exepath = filename.substr(0, filename.find_last_of("/"));
   auto libPath =
       exepath.substr(0, exepath.find_last_of("/")) + "/libraries/std/head/";
-  std::cout << libPath << std::endl;
   std::ifstream ifs(path);
   std::string content((std::istreambuf_iterator<char>(ifs)),
                       (std::istreambuf_iterator<char>()));
@@ -174,7 +172,7 @@ void build(std::string path, std::string output, cfg::Mutibility mutability, boo
       PreProcessor pp;
       tokens = scanner.Scan(pp.PreProcess(content, libPath));
     } catch (int x) {
-      std::cout << " unparsable Char at index " + x;
+      std::cout << " unparsable Char at index " << x;
       return;
     }
     tokens.invert();
