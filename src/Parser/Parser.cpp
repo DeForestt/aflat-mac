@@ -5,7 +5,7 @@
 
 ast::Expr *prioritizeExpr(ast::Expr *expr);
 
-parse::Parser::Parser(int mutability = 0) {
+parse::Parser::Parser(int mutability) {
   this->typeList.foo = ast::Type::compair;
   this->mutability = mutability;
 
@@ -76,7 +76,7 @@ int getOpPriority(ast::Op op) {
  * parse return: AST::Statement - the parsed statement
  */
 ast::Statment *parse::Parser::parseStmt(links::LinkedList<lex::Token *> &tokens,
-                                        bool singleStmt = false) {
+                                        bool singleStmt) {
   ast::Statment *output = new ast::Statment;
   if (tokens.head == nullptr) {
     return output;

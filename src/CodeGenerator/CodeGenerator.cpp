@@ -68,7 +68,7 @@ ast::Statment* extract(std::string ident, ast::Statment* stmt,
   if (dynamic_cast<ast::Sequence*>(stmt) != nullptr) {
     ast::Sequence* seq = dynamic_cast<ast::Sequence*>(stmt);
     ast::Statment* temp = extract(ident, seq->Statment1, id);
-    if (ident != "*" & temp != nullptr) {
+    if (ident != "*" && temp != nullptr) {
       return temp;
     } else if (ident != "*") {
       return extract(ident, seq->Statment2, id);
@@ -131,7 +131,7 @@ std::string getUUID() {
   return uuid;
 };
 
-void gen::CodeGenerator::alert(std::string message, bool error = true) {
+void gen::CodeGenerator::alert(std::string message, bool error) {
   if (error) {
     std::cout << "Error: on line " << this->logicalLine << ": ";
     if (this->scope != nullptr) {
@@ -187,7 +187,7 @@ gen::CodeGenerator::resolveSymbol(std::string ident,
                                   links::LinkedList<std::string> modList,
                                   asmc::File& OutputFile,
                                   links::LinkedList<ast::Expr*> indicies,
-                                  bool internal = false) {
+                                  bool internal) {
   asmc::File pops;
   modList.invert();
   modList.reset();
@@ -354,7 +354,7 @@ gen::CodeGenerator::resolveSymbol(std::string ident,
 };
 
 bool gen::CodeGenerator::canAssign(ast::Type type, std::string typeName,
-                                   bool strict = false) {
+                                   bool strict) {
   if (type.typeName == typeName) return true;
   if (typeName == "void") this->alert("cannot use void function as value");
   if (typeName == "--std--flex--function" || typeName == "any" || type.typeName == "any") return true;
@@ -410,7 +410,7 @@ bool gen::CodeGenerator::canAssign(ast::Type type, std::string typeName,
 
 gen::Expr gen::CodeGenerator::prepareCompound(ast::Compound compound,
                                               asmc::File& OutputFile,
-                                              bool isDiv = false) {
+                                              bool isDiv) {
   asmc::Mov* mov1 = new asmc::Mov();
   asmc::Mov* mov2 = new asmc::Mov();
   std::string r1 = "%edx", r2 = "%rdi";
@@ -487,7 +487,7 @@ gen::Expr gen::CodeGenerator::genArithmatic(asmc::ArithInst* inst,
   output.type = expr.type;
   return output;
 }
-gen::Expr gen::CodeGenerator::GenExpr(ast::Expr* expr, asmc::File& OutputFile, asmc::Size size = asmc::AUTO) {
+gen::Expr gen::CodeGenerator::GenExpr(ast::Expr* expr, asmc::File& OutputFile, asmc::Size size) {
   gen::Expr output;
   output.op = asmc::Hard;
   this->logicalLine = expr->logicalLine;
@@ -2208,7 +2208,7 @@ void gen::CodeGenerator::genDecAssign(ast::DecAssign* decAssign,
     auto lable = new asmc::Lable();
 
     lable->lable = dec->Ident;
-    if (dec->type.size = asmc::QWord) {
+    if (dec->type.size == asmc::QWord) {
       var->command = "quad";
     }
     gen::Expr exp = this->GenExpr(decAssign->expr, OutputFile);

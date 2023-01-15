@@ -37,7 +37,7 @@ void gen::scope::ScopeManager::reset() {
 }
 
 int gen::scope::ScopeManager::assign(std::string symbol, ast::Type type,
-                                     bool mask, bool mut = true) {
+                                     bool mask, bool mut) {
   auto sym = gen::Symbol();
 
   for (int i = 0; i < this->stack.size(); i++) {
@@ -78,7 +78,7 @@ void gen::scope::ScopeManager::pushScope(bool func) {
 
 void gen::scope::ScopeManager::popScope(CodeGenerator *callback,
                                         asmc::File &OutputFile,
-                                        bool fPop = false) {
+                                        bool fPop) {
   int size = this->scopeStack.back();
   for (int i = 0; i < size; i++) {
     if (!fPop) {
