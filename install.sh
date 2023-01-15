@@ -6,12 +6,6 @@ if ! [ -x "$(command -v git)" ]; then
   exit 1
 fi
 
-# Check for cmake
-if ! [ -x "$(command -v cmake)" ]; then
-  echo 'Error: cmake is not installed.' >&2
-  exit 1
-fi
-
 # Check if aflat is in the PATH
 if ! [ -x "$(command -v aflat)" ]; then
 
@@ -41,7 +35,7 @@ mkdir ~/.aflat
 (cd ~/.aflat && git clone https://github.com/DeForestt/aflat-mac.git aflat)
 
 # Build aflat
-(cd ~/.aflat/aflat && mkdir bin && make ../. && cd .. && cmake --build build > buildLog.log)
+(cd ~/.aflat/aflat && mkdir bin && make ../. > buildLog.log)
 
 # Build libs
 (cd ~/.aflat/aflat && bash rebuild-libs.sh)
