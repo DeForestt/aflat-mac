@@ -10,6 +10,7 @@
 #include "PreProcessor.hpp"
 #include "Scanner.hpp"
 #include "Parser/Lower.hpp"
+#include <mach-o/dyld.h>
 #pragma region helper functions
 
 bool gen::Enum::compairEnum(gen::Enum::EnumValue e, std::string ident) {
@@ -27,10 +28,23 @@ bool searchSymbol(gen::Symbol sym, std::string str) {
     return false;
 }
 
+/*
+ * function name:   getExePath
+ * description:     gets the path of the executable
+ * parameters:      none
+ * return value:    string - the path of the executable
+ */
+std::string getPath() {
+  char path[1024];
+  uint32_t size = sizeof(path);
+  if (_NSGetExecutablePath(path, &size) == 0)
+    return std::string(path);
+  else
+    return std::string("");
+}
+
 std::string getLibPath(std::string lib) {
-  char result[200];
-  ssize_t count = readlink("/proc/self/exe", result, 200);
-  std::string filename = std::string(result, (count > 0) ? count : 0);
+  std::string filename = getPath();
   std::string exepath = filename.substr(0, filename.find_last_of("/"));
   std::string libPath = exepath.substr(0, exepath.find_last_of("/")) +
                         "/libraries/std/" + lib + "/";
@@ -2035,7 +2049,7 @@ void gen::CodeGenerator::genDeclare(ast::Declare* dec, asmc::File& OutputFile) {
       alert("redefined global veriable: " + dec->Ident);
 
     lable->lable = dec->Ident;
-    if (dec->type.size = asmc::QWord) {
+    if (dec->type.size == asmc::QWord) {
       var->command = "quad";
     };
     gen::Symbol Symbol;
@@ -3129,7 +3143,6 @@ void gen::CodeGenerator::genClass(ast::Class* deff, asmc::File& OutputFile) {
     }
     return false;
   };
-  type->SymbolTable;
   this->typeList.push(type);
   // write any signed contracts
   if (deff->base != "") {

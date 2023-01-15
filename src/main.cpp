@@ -17,6 +17,7 @@
 #include <thread>
 #include <unistd.h>
 #include <vector>
+#include <mach-o/dyld.h>
 
 std::string preProcess(std::string input);
 std::string getExePath();
@@ -157,10 +158,12 @@ void build(std::string path, std::string output, cfg::Mutibility mutability, boo
   links::LinkedList<lex::Token *> tokens;
 
   auto filename = getExePath();
+  std::cout << filename << std::endl;
   auto wd = std::filesystem::current_path();
   auto exepath = filename.substr(0, filename.find_last_of("/"));
   auto libPath =
       exepath.substr(0, exepath.find_last_of("/")) + "/libraries/std/head/";
+  std::cout << libPath << std::endl;
   std::ifstream ifs(path);
   std::string content((std::istreambuf_iterator<char>(ifs)),
                       (std::istreambuf_iterator<char>()));
@@ -269,9 +272,12 @@ void build(std::string path, std::string output, cfg::Mutibility mutability, boo
  * return value:    string - the path of the executable
  */
 std::string getExePath() {
-  char result[200];
-  auto count = readlink("/proc/self/exe", result, 200);
-  return std::string(result, (count > 0) ? count : 0);
+  char path[1024];
+  uint32_t size = sizeof(path);
+  if (_NSGetExecutablePath(path, &size) == 0)
+    return std::string(path);
+  else
+    return std::string("");
 }
 
 /*
